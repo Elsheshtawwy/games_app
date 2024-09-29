@@ -238,3 +238,14 @@ class ScreenshotsWidget extends StatelessWidget {
     );
   }
 }
+
+class SameGenreWidget extends StatelessWidget {
+  const SameGenreWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      
+    );
+  }
+}

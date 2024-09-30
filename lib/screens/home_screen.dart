@@ -1,9 +1,5 @@
-import 'dart:convert';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:games_app/models/GameCardModel.dart';
 import 'package:games_app/providers/games_provider.dart';
 import 'package:games_app/screens/game_details.dart';
 import 'package:games_app/widgets/cards/game_card.dart';

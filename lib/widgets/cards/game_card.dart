@@ -1,12 +1,10 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:games_app/models/GameCardModel.dart';
-
 import 'package:flutter/material.dart';
 
 class GameCard extends StatelessWidget {
   const GameCard({super.key, required this.gameModel});
-
   final GameModel gameModel;
 
   @override

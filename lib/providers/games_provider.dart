@@ -40,12 +40,6 @@ class GamesProvider with ChangeNotifier {
 
     if (response.statusCode == 200) {
       var decodedData = json.decode(response.body);
-      detailedGameModel = GameDetailsModel.fromJson(decodedData);
-      getGamesByCategory(detailedGameModel!.genre);
-    }
-
-    if (response.statusCode == 200) {
-      var decodedData = json.decode(response.body);
       similarGames =
           List<GameModel>.from(decodedData.map((e) => GameModel.fromJson(e)))
               .toList();

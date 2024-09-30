@@ -1,5 +1,7 @@
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:full_screen_image/full_screen_image.dart';
+import 'package:games_app/helpers/clicables/drawer_tile.dart';
+import 'package:games_app/providers/dark_mode_provider.dart';
 import 'package:games_app/providers/games_provider.dart';
 import 'package:games_app/widgets/cards/game_card.dart';
 import 'package:flutter/material.dart';
@@ -22,28 +24,47 @@ class _GameDetailsScreenState extends State<GameDetailsScreen> {
   void initState() {
     Provider.of<GamesProvider>(context, listen: false)
         .fetchGameById(widget.gameId);
+    Provider.of<DarkModeProvider>(context, listen: false).getMode();
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return Consumer<GamesProvider>(
-        builder: (context, gameDetailsProvider, child) {
+    return Consumer2<GamesProvider, DarkModeProvider>(
+        builder: (context, gameDetailsConsumer, darkModeConsumer, child) {
       return Scaffold(
+        drawer: Drawer(
+          backgroundColor:
+              darkModeConsumer.isDark ? Colors.black : Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 32),
+            child: Column(
+              children: [
+                DrawerTile(
+                  icon: darkModeConsumer.isDark
+                      ? Icons.dark_mode
+                      : Icons.light_mode,
+                  text: darkModeConsumer.isDark ? "Dark Mode" : "Light Mode",
+                ),
+              ],
+            ),
+          ),
+        ),
         appBar: AppBar(
           centerTitle: true,
           title: Text(
-            gameDetailsProvider.isLoading ||
-                    gameDetailsProvider.detailedGameModel == null
+            gameDetailsConsumer.isLoading ||
+                    gameDetailsConsumer.detailedGameModel == null
                 ? "Loading..."
-                : gameDetailsProvider.detailedGameModel!.title,
+                : gameDetailsConsumer.detailedGameModel!.title,
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ),
         body: Center(
-          child: gameDetailsProvider.isLoading &&
-                  gameDetailsProvider.detailedGameModel == null
+          child: gameDetailsConsumer.isLoading &&
+                  gameDetailsConsumer.detailedGameModel == null
               ? const CircularProgressIndicator()
               : SingleChildScrollView(
                   child: Padding(
@@ -58,7 +79,7 @@ class _GameDetailsScreenState extends State<GameDetailsScreen> {
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(16),
                                 child: Image.network(
-                                  gameDetailsProvider
+                                  gameDetailsConsumer
                                       .detailedGameModel!.thumbnail,
                                   width: size.width,
                                   fit: BoxFit.contain,
@@ -70,7 +91,7 @@ class _GameDetailsScreenState extends State<GameDetailsScreen> {
                               right: 16,
                               child: Row(
                                 children: [
-                                  if (gameDetailsProvider
+                                  if (gameDetailsConsumer
                                       .detailedGameModel!.platform
                                       .toUpperCase()
                                       .contains("Windows".toUpperCase()))
@@ -80,7 +101,7 @@ class _GameDetailsScreenState extends State<GameDetailsScreen> {
                                       size: 32,
                                     ),
                                   const SizedBox(width: 16),
-                                  if (gameDetailsProvider
+                                  if (gameDetailsConsumer
                                       .detailedGameModel!.platform
                                       .toUpperCase()
                                       .contains("web".toUpperCase()))
@@ -98,28 +119,38 @@ class _GameDetailsScreenState extends State<GameDetailsScreen> {
                         ElevatedButton(
                             onPressed: () {
                               LaunchExternalUrl(
-                                gameDetailsProvider.detailedGameModel!.gameUrl,
+                                gameDetailsConsumer.detailedGameModel!.gameUrl,
                               );
                             },
                             child: Text("data")),
                         const SizedBox(height: 8),
                         Text(
-                          gameDetailsProvider.detailedGameModel!.title,
-                          style: const TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
+                          gameDetailsConsumer.detailedGameModel!.title,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: darkModeConsumer.isDark
+                                ? Colors.white
+                                : Colors.black,
+                          ),
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          gameDetailsProvider
+                          gameDetailsConsumer
                               .detailedGameModel!.shortDescription,
-                          style: const TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.normal),
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.normal,
+                            color: darkModeConsumer.isDark
+                                ? Colors.white
+                                : Colors.black,
+                          ),
                         ),
                         SizedBox(
                           height: 200,
                           child: ListView.builder(
                             shrinkWrap: true,
-                            itemCount: gameDetailsProvider
+                            itemCount: gameDetailsConsumer
                                 .detailedGameModel!.screenshots.length,
                             scrollDirection: Axis.horizontal,
                             itemBuilder: (context, index) {
@@ -134,7 +165,7 @@ class _GameDetailsScreenState extends State<GameDetailsScreen> {
                                         Hero(
                                           tag: 'hero',
                                           child: Image.network(
-                                            gameDetailsProvider
+                                            gameDetailsConsumer
                                                 .detailedGameModel!
                                                 .screenshots[index]
                                                 .image,
@@ -145,7 +176,7 @@ class _GameDetailsScreenState extends State<GameDetailsScreen> {
                                       child: Hero(
                                         tag: "hero",
                                         child: Image.network(
-                                          gameDetailsProvider.detailedGameModel!
+                                          gameDetailsConsumer.detailedGameModel!
                                               .screenshots[index].image,
                                           fit: BoxFit.cover,
                                         ),
@@ -162,11 +193,14 @@ class _GameDetailsScreenState extends State<GameDetailsScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              gameDetailsProvider
+                              gameDetailsConsumer
                                   .detailedGameModel!.description,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
+                                color: darkModeConsumer.isDark
+                                    ? Colors.white
+                                    : Colors.black,
                               ),
                               maxLines: isShowMore ? 50 : 3,
                             ),
@@ -188,39 +222,67 @@ class _GameDetailsScreenState extends State<GameDetailsScreen> {
                           ],
                         ),
                         const SizedBox(height: 16),
-                        if (gameDetailsProvider
+                        if (gameDetailsConsumer
                                 .detailedGameModel!.minimumSystemRequirements !=
                             null)
                           MinimumSystemRequirmentsCard(
-                              minimumSystemRequirments:
-                                  gameDetailsProvider
-                                .detailedGameModel!.minimumSystemRequirements
-                                  ),
+                              minimumSystemRequirments: gameDetailsConsumer
+                                  .detailedGameModel!
+                                  .minimumSystemRequirements),
                         const SizedBox(height: 16),
-                        const Text(
+                        Text(
                           "Similar Games",
                           style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 24),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 24,
+                            color: darkModeConsumer.isDark
+                                ? Colors.white
+                                : Colors.black,
+                          ),
                         ),
                         const SizedBox(height: 16),
                         SizedBox(
                           height: size.height * 0.33,
                           child: ListView.builder(
-                            shrinkWrap: true,
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            scrollDirection: Axis.horizontal,
-                            itemCount: gameDetailsProvider.similarGames.length,
-                            itemBuilder: (context, index) => SizedBox(
-                              height: 150,
-                              width: size.width * 0.5,
-                              child: Padding(
-                                padding: const EdgeInsets.only(right: 16),
-                                child: GameCard(
-                                    gameModel: gameDetailsProvider
-                                        .similarGames[index]),
-                              ),
-                            ),
-                          ),
+                              scrollDirection: Axis.horizontal,
+                              itemCount:
+                                  gameDetailsConsumer.similarGames.length,
+                              itemBuilder: (context, index) {
+                                print(gameDetailsConsumer.games[index].title);
+                                return AnimatedSwitcher(
+                                    duration: const Duration(milliseconds: 300),
+                                    child: Padding(
+                                        padding: const EdgeInsets.all(8),
+                                        child: gameDetailsConsumer.isLoading
+                                            ? CircularProgressIndicator()
+                                            : GestureDetector(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              GameDetailsScreen(
+                                                                  gameId: gameDetailsConsumer
+                                                                      .similarGames[
+                                                                          index]
+                                                                      .id
+                                                                      .toString())));
+                                                },
+                                                child: SizedBox(
+                                                  width: 300,
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            10.0),
+                                                    child: GameCard(
+                                                        gameModel:
+                                                            gameDetailsConsumer
+                                                                    .similarGames[
+                                                                index]),
+                                                  ),
+                                                ),
+                                              )));
+                              }),
                         ),
                         const SizedBox(height: 16),
                       ],

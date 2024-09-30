@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:games_app/helpers/clicables/drawer_tile.dart';
+import 'package:games_app/providers/dark_mode_provider.dart';
 import 'package:games_app/providers/games_provider.dart';
 import 'package:games_app/screens/game_details.dart';
 import 'package:games_app/widgets/cards/game_card.dart';
@@ -17,85 +19,127 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int nowIndex = 0;
 
-
   @override
   void initState() {
     Provider.of<GamesProvider>(context, listen: false).fetchGames("all");
+    Provider.of<DarkModeProvider>(context, listen: false).getMode();
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<GamesProvider>(
-      builder: (context, gamesProvider, child) {
-        return Scaffold(
-          appBar: AppBar(),
-          body: Center(
-            child: GridView.builder(
-              itemCount: gamesProvider.isLoading ? 6 : gamesProvider.games.length,
-              padding: const EdgeInsets.all(16),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
-                childAspectRatio: 0.7,
-                crossAxisCount: 2,
-              ),
-              itemBuilder: (context, index) {
-                return AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  child: gamesProvider.isLoading
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: Shimmer.fromColors(
-                            baseColor: Colors.black12,
-                            highlightColor: Colors.white38,
-                            child: Container(
-                              color: Colors.white,
-                              height: double.infinity,
-                              width: double.infinity,
-                            ),
-                          ),
-                        )
-                      : GestureDetector(
-                          onTap: () {
-                            Navigator.push(context,MaterialPageRoute(builder: (contex)=>GameDetailsScreen(gameId: gamesProvider.games[index].id.toString()))
-                                );
-                          },
-                          child: GameCard(
-                            gameModel: gamesProvider.games[index],
-                          ),
-                        ),
-                );
-              },
+    return Consumer2<GamesProvider, DarkModeProvider>(
+        builder: (context, gamesProvider, darkModeConsumer, child) {
+      return Scaffold(
+        // backgroundColor: darkModeConsumer.isDark ? Colors.black : Colors.white,
+        drawer: Drawer(
+          backgroundColor:
+              darkModeConsumer.isDark ? Colors.black : Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 32),
+            child: Column(
+              children: [
+                DrawerTile(
+                  icon: darkModeConsumer.isDark
+                      ? Icons.dark_mode
+                      : Icons.light_mode,
+                  text: darkModeConsumer.isDark ? "Dark Mode" : "Light Mode",
+                ),
+              ],
             ),
           ),
-          bottomNavigationBar: BottomNavigationBar(
-            selectedLabelStyle: GoogleFonts.roboto(fontWeight: FontWeight.bold),
-            unselectedLabelStyle:
-                GoogleFonts.roboto(fontWeight: FontWeight.normal, fontSize: 12),
-            onTap: (currentIndex) {
-              setState(() {
-                nowIndex = currentIndex;
-              });
-        
-              gamesProvider.fetchGames(currentIndex == 0
-                  ? "all"
-                  : currentIndex == 1
-                      ? "pc"
-                      : "browser");
+        ),
+        appBar: AppBar(),
+        body: Center(
+          child: GridView.builder(
+            itemCount: gamesProvider.isLoading ? 6 : gamesProvider.games.length,
+            padding: const EdgeInsets.all(16),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              mainAxisSpacing: 16,
+              crossAxisSpacing: 16,
+              childAspectRatio: 0.7,
+              crossAxisCount: 2,
+            ),
+            itemBuilder: (context, index) {
+              return AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: gamesProvider.isLoading
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: Shimmer.fromColors(
+                          baseColor: Colors.black12,
+                          highlightColor: Colors.white38,
+                          child: Container(
+                            color: Colors.white,
+                            height: double.infinity,
+                            width: double.infinity,
+                          ),
+                        ),
+                      )
+                    : GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (contex) => GameDetailsScreen(
+                                      gameId: gamesProvider.games[index].id
+                                          .toString())));
+                        },
+                        child: GameCard(
+                          gameModel: gamesProvider.games[index],
+                        ),
+                      ),
+              );
             },
-            currentIndex: nowIndex,
-            items: const [
-              BottomNavigationBarItem(
-                  label: "ALL", icon: Icon(FontAwesomeIcons.gamepad)),
-              BottomNavigationBarItem(
-                  label: "PC", icon: Icon(FontAwesomeIcons.computer)),
-              BottomNavigationBarItem(
-                  label: "WEB", icon: Icon(FontAwesomeIcons.globe)),
-            ],
           ),
-        );
-      }
-    );
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          backgroundColor:
+              darkModeConsumer.isDark ? Colors.black : Colors.white,
+          selectedLabelStyle: GoogleFonts.roboto(
+            fontWeight: FontWeight.bold,
+            color: darkModeConsumer.isDark ? Colors.white : Colors.black,
+          ),
+          unselectedLabelStyle: GoogleFonts.roboto(
+            fontWeight: FontWeight.normal,
+            fontSize: 12,
+            color: darkModeConsumer.isDark ? Colors.white : Colors.black,
+          ),
+          onTap: (currentIndex) {
+            setState(() {
+              nowIndex = currentIndex;
+            });
+
+            gamesProvider.fetchGames(currentIndex == 0
+                ? "all"
+                : currentIndex == 1
+                    ? "pc"
+                    : "browser");
+          },
+          currentIndex: nowIndex,
+          items: [
+            BottomNavigationBarItem(
+                label: "ALL",
+                icon: Icon(
+                  FontAwesomeIcons.gamepad,
+                  color: darkModeConsumer.isDark ? Colors.white : Colors.black,
+                )),
+            BottomNavigationBarItem(
+                label: "PC",
+                icon: Icon(
+                  FontAwesomeIcons.computer,
+                  color: darkModeConsumer.isDark ? Colors.white : Colors.black,
+                )),
+            BottomNavigationBarItem(
+                label: "WEB",
+                icon: Icon(
+                  FontAwesomeIcons.globe,
+                  color: darkModeConsumer.isDark ? Colors.white : Colors.black,
+                )),
+          ],
+        ),
+      );
+    });
   }
 }

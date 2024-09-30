@@ -3,6 +3,7 @@ import 'package:full_screen_image/full_screen_image.dart';
 import 'package:games_app/providers/games_provider.dart';
 import 'package:games_app/widgets/cards/game_card.dart';
 import 'package:flutter/material.dart';
+import 'package:games_app/widgets/cards/minimum_system_requirments_card.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -19,15 +20,16 @@ class _GameDetailsScreenState extends State<GameDetailsScreen> {
 
   @override
   void initState() {
-    
-    Provider.of<GamesProvider>(context, listen: false).fetchGameById(widget.gameId);
+    Provider.of<GamesProvider>(context, listen: false)
+        .fetchGameById(widget.gameId);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return Consumer<GamesProvider>(builder: (context, gameDetailsProvider, child) {
+    return Consumer<GamesProvider>(
+        builder: (context, gameDetailsProvider, child) {
       return Scaffold(
         appBar: AppBar(
           centerTitle: true,
@@ -56,7 +58,8 @@ class _GameDetailsScreenState extends State<GameDetailsScreen> {
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(16),
                                 child: Image.network(
-                                  gameDetailsProvider.detailedGameModel!.thumbnail,
+                                  gameDetailsProvider
+                                      .detailedGameModel!.thumbnail,
                                   width: size.width,
                                   fit: BoxFit.contain,
                                 ),
@@ -107,7 +110,8 @@ class _GameDetailsScreenState extends State<GameDetailsScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          gameDetailsProvider.detailedGameModel!.shortDescription,
+                          gameDetailsProvider
+                              .detailedGameModel!.shortDescription,
                           style: const TextStyle(
                               fontSize: 18, fontWeight: FontWeight.normal),
                         ),
@@ -130,8 +134,10 @@ class _GameDetailsScreenState extends State<GameDetailsScreen> {
                                         Hero(
                                           tag: 'hero',
                                           child: Image.network(
-                                            gameDetailsProvider.detailedGameModel!
-                                                .screenshots[index].image,
+                                            gameDetailsProvider
+                                                .detailedGameModel!
+                                                .screenshots[index]
+                                                .image,
                                             fit: BoxFit.contain,
                                           ),
                                         );
@@ -156,7 +162,8 @@ class _GameDetailsScreenState extends State<GameDetailsScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              gameDetailsProvider.detailedGameModel!.description,
+                              gameDetailsProvider
+                                  .detailedGameModel!.description,
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -184,42 +191,11 @@ class _GameDetailsScreenState extends State<GameDetailsScreen> {
                         if (gameDetailsProvider
                                 .detailedGameModel!.minimumSystemRequirements !=
                             null)
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                "Minimum System Requirements",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 24),
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                "OS: ${gameDetailsProvider.detailedGameModel!.minimumSystemRequirements!.os}",
-                                style: const TextStyle(
-                                    fontSize: 14, fontWeight: FontWeight.w600),
-                              ),
-                              Text(
-                                "MEMORY: ${gameDetailsProvider.detailedGameModel!.minimumSystemRequirements!.memory}",
-                                style: const TextStyle(
-                                    fontSize: 14, fontWeight: FontWeight.w600),
-                              ),
-                              Text(
-                                "PROCESSOR: ${gameDetailsProvider.detailedGameModel!.minimumSystemRequirements!.processor}",
-                                style: const TextStyle(
-                                    fontSize: 14, fontWeight: FontWeight.w600),
-                              ),
-                              Text(
-                                "GRAPHICS: ${gameDetailsProvider.detailedGameModel!.minimumSystemRequirements!.graphics}",
-                                style: const TextStyle(
-                                    fontSize: 14, fontWeight: FontWeight.w600),
-                              ),
-                              Text(
-                                "STORAGE: ${gameDetailsProvider.detailedGameModel!.minimumSystemRequirements!.storage}",
-                                style: const TextStyle(
-                                    fontSize: 14, fontWeight: FontWeight.w600),
-                              ),
-                            ],
-                          ),
+                          MinimumSystemRequirmentsCard(
+                              minimumSystemRequirments:
+                                  gameDetailsProvider
+                                .detailedGameModel!.minimumSystemRequirements
+                                  ),
                         const SizedBox(height: 16),
                         const Text(
                           "Similar Games",
@@ -240,8 +216,8 @@ class _GameDetailsScreenState extends State<GameDetailsScreen> {
                               child: Padding(
                                 padding: const EdgeInsets.only(right: 16),
                                 child: GameCard(
-                                    gameModel:
-                                        gameDetailsProvider.similarGames[index]),
+                                    gameModel: gameDetailsProvider
+                                        .similarGames[index]),
                               ),
                             ),
                           ),

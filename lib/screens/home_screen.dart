@@ -8,7 +8,6 @@ import 'package:games_app/providers/games_provider.dart';
 import 'package:games_app/screens/game_details.dart';
 import 'package:games_app/widgets/cards/game_card.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 

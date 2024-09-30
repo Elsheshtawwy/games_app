@@ -21,7 +21,6 @@ class _HomeScreenState extends State<HomeScreen> {
   int nowIndex = 0;
   bool isLoading = false;
   List<GameModel> games = [];
-  List<GameDetails> gameDetails = [];
 
   fetchGames(String platform) async {
     setState(() {
@@ -85,11 +84,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     )
-                  : GameCard(
-                      gameModel: games[index],
-                      onCardTap: (gameModel) {
-                        print("Card Tapped ${gameModel.id}");
+                  : GestureDetector(
+                      onTap: () {
+                        Navigator.push(context,MaterialPageRoute(builder: (contex)=>GameDetailsScreen(gameId: games[index].id.toString()))
+                            );
                       },
+                      child: GameCard(
+                        gameModel: games[index],
+                      ),
                     ),
             );
           },

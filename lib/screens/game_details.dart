@@ -1,251 +1,285 @@
 import 'dart:convert';
-
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:full_screen_image/full_screen_image.dart';
+import 'package:games_app/models/GameCardModel.dart';
 import 'package:games_app/models/GameDetailsModel.dart';
+import 'package:games_app/widgets/cards/game_card.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class GameDetailsScreen extends StatefulWidget {
-  final String gameID;
-
-  const GameDetailsScreen({super.key, required this.gameID});
+  const GameDetailsScreen({super.key, required this.gameId});
+  final String gameId;
 
   @override
-  _GameDetailsScreenState createState() => _GameDetailsScreenState();
+  State<GameDetailsScreen> createState() => _GameDetailsScreenState();
 }
 
 class _GameDetailsScreenState extends State<GameDetailsScreen> {
-  GameDetailsModel? gameDetailsModel;
+  bool isLoading = false;
+  GameDetailsModel? detailedGameModel;
+  List<GameModel> similarGames = [];
+  bool isShowMore = false;
 
   @override
   void initState() {
     super.initState();
-    _fetchGameDetails();
+    fetchGameById(widget.gameId);
   }
 
-  Future<void> _fetchGameDetails() async {
-    final response = await http.get(
-        Uri.parse('https://www.freetogame.com/api/game?id=${widget.gameID}'));
-    final game_DetailsModel =
-        GameDetailsModel.fromJson(jsonDecode(response.body));
+  fetchGameById(String id) async {
     setState(() {
-      gameDetailsModel = game_DetailsModel;
+      isLoading = true;
+    });
+
+    final response =
+        await http.get(Uri.parse("https://www.freetogame.com/api/game?id=$id"));
+
+    if (kDebugMode) {
+      print("REQUEST ON URL : https://www.freetogame.com/api/game?id=$id");
+      print("STATUS CODE : ${response.statusCode}");
+      print("BODY : ${response.body}");
+    }
+
+    if (response.statusCode == 200) {
+      var decodedData = json.decode(response.body);
+      detailedGameModel = GameDetailsModel.fromJson(decodedData);
+      getGamesByCategory(detailedGameModel!.genre);
+    }
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  getGamesByCategory(String category) async {
+    setState(() {
+      isLoading = true;
+    });
+    final response = await http.get(
+        Uri.parse("https://www.freetogame.com/api/games?category=$category"));
+
+    if (kDebugMode) {
+      print("STATUS CODE : ${response.statusCode}");
+      print("BODY : ${response.body}");
+    }
+
+    if (response.statusCode == 200) {
+      var decodedData = json.decode(response.body);
+      similarGames =
+          List<GameModel>.from(decodedData.map((e) => GameModel.fromJson(e)))
+              .toList();
+    }
+    setState(() {
+      isLoading = false;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (gameDetailsModel == null) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
-    }
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        title: Text(gameDetailsModel!.title),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              GameTitleAndThumbnail(
-                title: gameDetailsModel!.title,
-                thumbnail: gameDetailsModel!.thumbnail,
-              ),
-              const SizedBox(height: 16),
-              GameStatusAndDescription(
-                status: gameDetailsModel!.status,
-                shortDescription: gameDetailsModel!.shortDescription,
-              ),
-              const SizedBox(height: 16),
-              ScreenshotsWidget(
-                screenshots: gameDetailsModel!.screenshots,
-              ),
-              const SizedBox(height: 16),
-              GameDetails(
-                description: gameDetailsModel!.description,
-                gameUrl: gameDetailsModel!.gameUrl,
-                genre: gameDetailsModel!.genre,
-                platform: gameDetailsModel!.platform,
-                publisher: gameDetailsModel!.publisher,
-                developer: gameDetailsModel!.developer,
-                releaseDate: gameDetailsModel!.releaseDate,
-              ),
-              const SizedBox(height: 16),
-              gameDetailsModel!.platform != "Browser"
-                  ? MinimumSystemRequirementsWidget(
-                      minimumSystemRequirements:
-                          gameDetailsModel?.minimumSystemRequirements,
-                      gameDetails: gameDetailsModel!,
-                    )
-                  : const SizedBox(height: 16),
-            ],
-          ),
+        centerTitle: true,
+        title: Text(
+          isLoading || detailedGameModel == null
+              ? "Loading..."
+              : detailedGameModel!.title,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
       ),
-    );
-  }
-}
-
-class GameTitleAndThumbnail extends StatelessWidget {
-  final String title;
-  final String thumbnail;
-
-  const GameTitleAndThumbnail(
-      {super.key, required this.title, required this.thumbnail});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Image.network(thumbnail, scale: 1.1),
-        const SizedBox(width: 16),
-        Text(
-            textAlign: TextAlign.center,
-            title,
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            )),
-      ],
-    );
-  }
-}
-
-class GameStatusAndDescription extends StatelessWidget {
-  final String status;
-  final String shortDescription;
-
-  const GameStatusAndDescription(
-      {super.key, required this.status, required this.shortDescription});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(status, style: const TextStyle(fontSize: 18)),
-        const SizedBox(height: 8),
-        Text(shortDescription, style: const TextStyle(fontSize: 16)),
-      ],
-    );
-  }
-}
-
-class GameDetails extends StatelessWidget {
-  final String description;
-  final String gameUrl;
-  final String genre;
-  final String platform;
-  final String publisher;
-  final String developer;
-  final DateTime releaseDate;
-
-  const GameDetails({
-    super.key,
-    required this.description,
-    required this.gameUrl,
-    required this.genre,
-    required this.platform,
-    required this.publisher,
-    required this.developer,
-    required this.releaseDate,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(description, style: const TextStyle(fontSize: 16)),
-        const SizedBox(height: 8),
-        Text('Game URL: $gameUrl', style: const TextStyle(fontSize: 16)),
-        const SizedBox(height: 8),
-        Text('Genre: $genre',
-            style: const TextStyle(
-              fontSize: 16,
-            )),
-        const SizedBox(height: 8),
-        Text('Platform: $platform', style: const TextStyle(fontSize: 16)),
-        const SizedBox(height: 8),
-        Text('Publisher: $publisher', style: const TextStyle(fontSize: 16)),
-        const SizedBox(height: 8),
-        Text('Developer: $developer', style: const TextStyle(fontSize: 16)),
-        const SizedBox(height: 8),
-        Text(
-            'Release Date: ${releaseDate.year}-${releaseDate.month}-${releaseDate.day}',
-            style: const TextStyle(fontSize: 16)),
-      ],
-    );
-  }
-}
-
-class MinimumSystemRequirementsWidget extends StatelessWidget {
-  final MinimumSystemRequirements? minimumSystemRequirements;
-  final GameDetailsModel gameDetails;
-
-  const MinimumSystemRequirementsWidget(
-      {super.key, this.minimumSystemRequirements, required this.gameDetails});
-
-  @override
-  Widget build(BuildContext context) {
-    return gameDetails.platform == "Browser"
-        ? const Text("No system requirements available for browser games.")
-        : gameDetails.minimumSystemRequirements == null
-            ? const Text("")
-            : Column(
-                children: [
-                  const Text('Minimum System Requirements:',
-                      style: TextStyle(fontSize: 18)),
-                  const SizedBox(height: 8),
-                  Text('OS: ${minimumSystemRequirements?.os}',
-                      style: const TextStyle(fontSize: 16)),
-                  const SizedBox(height: 8),
-                  Text('Processor: ${minimumSystemRequirements?.processor}',
-                      style: const TextStyle(fontSize: 16)),
-                  const SizedBox(height: 8),
-                  Text('Memory: ${minimumSystemRequirements?.memory}',
-                      style: const TextStyle(fontSize: 16)),
-                  const SizedBox(height: 8),
-                  Text('Graphics: ${minimumSystemRequirements?.graphics}',
-                      style: const TextStyle(fontSize: 16)),
-                  const SizedBox(height: 8),
-                  Text('Storage: ${minimumSystemRequirements?.storage}',
-                      style: const TextStyle(fontSize: 16)),
-                ],
-              );
-  }
-}
-
-class ScreenshotsWidget extends StatelessWidget {
-  final List<Screenshot> screenshots;
-
-  const ScreenshotsWidget({super.key, required this.screenshots});
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Container(
-        height: 200,
-        child: Row(
-          children: [
-            ...screenshots.map((screenshot) => Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Image.network(screenshot.image),
-                )),
-          ],
-        ),
+      body: Center(
+        child: isLoading && detailedGameModel == null
+            ? const CircularProgressIndicator()
+            : SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Stack(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: Image.network(
+                              detailedGameModel!.thumbnail,
+                              width: size.width,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          Positioned(
+                            top: 16,
+                            right: 16,
+                            child: Row(
+                              children: [
+                                if (detailedGameModel!.platform
+                                    .toUpperCase()
+                                    .contains("Windows".toUpperCase()))
+                                  const Icon(
+                                    FontAwesomeIcons.computer,
+                                    color: Colors.white,
+                                    size: 32,
+                                  ),
+                                const SizedBox(width: 16),
+                                if (detailedGameModel!.platform
+                                    .toUpperCase()
+                                    .contains("web".toUpperCase()))
+                                  const Icon(
+                                    FontAwesomeIcons.globe,
+                                    color: Colors.white,
+                                    size: 32,
+                                  ),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        detailedGameModel!.title,
+                        style: const TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        detailedGameModel!.shortDescription,
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.normal),
+                      ),
+                      const SizedBox(height: 8),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            detailedGameModel!.description,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: isShowMore ? 50 : 3,
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                isShowMore = !isShowMore;
+                              });
+                            },
+                            child: Text(
+                              isShowMore ? "show less..." : "show more...",
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.blue,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      GridView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: detailedGameModel!.screenshots.length,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          mainAxisSpacing: 8,
+                          crossAxisSpacing: 8,
+                          crossAxisCount: 2,
+                        ),
+                        itemBuilder: (context, index) {
+                          return FullScreenWidget(
+                            disposeLevel: DisposeLevel.Medium,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: GestureDetector(
+                                onTap: () {
+                                  child:
+                                  Hero(
+                                    tag: 'hero',
+                                    child: Image.network(detailedGameModel!
+                                        .screenshots[index].image),
+                                  );
+                                },
+                                child: Hero(
+                                  tag: "hero",
+                                  child: Image.network(
+                                    detailedGameModel!.screenshots[index].image,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      if (detailedGameModel!.minimumSystemRequirements != null)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Minimum System Requirements",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 24),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              "OS: ${detailedGameModel!.minimumSystemRequirements!.os}",
+                              style: const TextStyle(
+                                  fontSize: 14, fontWeight: FontWeight.w600),
+                            ),
+                            Text(
+                              "MEMORY: ${detailedGameModel!.minimumSystemRequirements!.memory}",
+                              style: const TextStyle(
+                                  fontSize: 14, fontWeight: FontWeight.w600),
+                            ),
+                            Text(
+                              "PROCESSOR: ${detailedGameModel!.minimumSystemRequirements!.processor}",
+                              style: const TextStyle(
+                                  fontSize: 14, fontWeight: FontWeight.w600),
+                            ),
+                            Text(
+                              "GRAPHICS: ${detailedGameModel!.minimumSystemRequirements!.graphics}",
+                              style: const TextStyle(
+                                  fontSize: 14, fontWeight: FontWeight.w600),
+                            ),
+                            Text(
+                              "STORAGE: ${detailedGameModel!.minimumSystemRequirements!.storage}",
+                              style: const TextStyle(
+                                  fontSize: 14, fontWeight: FontWeight.w600),
+                            ),
+                          ],
+                        ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        "Similar Games",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 24),
+                      ),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        height: size.height * 0.33,
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          scrollDirection: Axis.horizontal,
+                          itemCount: similarGames.length,
+                          itemBuilder: (context, index) => SizedBox(
+                            height: 150,
+                            width: size.width * 0.5,
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 16),
+                              child: GameCard(gameModel: similarGames[index]),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
+                ),
+              ),
       ),
-    );
-  }
-}
-
-class SameGenreWidget extends StatelessWidget {
-  const SameGenreWidget({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      
     );
   }
 }

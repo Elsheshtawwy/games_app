@@ -1,31 +1,18 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:games_app/models/GameCardModel.dart';
-import 'package:games_app/screens/game_details.dart';
 
 import 'package:flutter/material.dart';
 
 class GameCard extends StatelessWidget {
-  const GameCard({super.key, required this.gameModel, required this.onCardTap});
+  const GameCard({super.key, required this.gameModel});
 
   final GameModel gameModel;
-  final void Function(GameModel) onCardTap;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        onCardTap(gameModel);
-        Navigator.push(
-          context,
-          CupertinoPageRoute(
-            builder: (context) => GameDetailsScreen(
-              gameID: gameModel.id.toString(),
-            ),
-          ),
-        );
-      },
+      
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
         child: GridTile(

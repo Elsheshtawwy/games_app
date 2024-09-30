@@ -42,6 +42,8 @@ dependencies:
   shimmer:
   font_awesome_flutter:
   auto_size_text:
+  url_launcher:
+  full_screen_image:
 
 
 dev_dependencies:

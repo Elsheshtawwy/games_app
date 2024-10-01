@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:games_app/helpers/clicables/drawer_tile.dart';
+import 'package:games_app/helpers/clickable/drawer_tile.dart';
 import 'package:games_app/providers/dark_mode_provider.dart';
 import 'package:games_app/providers/games_provider.dart';
 import 'package:games_app/screens/game_details.dart';
@@ -32,7 +32,6 @@ class _HomeScreenState extends State<HomeScreen> {
     return Consumer2<GamesProvider, DarkModeProvider>(
         builder: (context, gamesProvider, darkModeConsumer, child) {
       return Scaffold(
-        // backgroundColor: darkModeConsumer.isDark ? Colors.black : Colors.white,
         drawer: Drawer(
           backgroundColor:
               darkModeConsumer.isDark ? Colors.black : Colors.white,
@@ -132,6 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: darkModeConsumer.isDark ? Colors.white : Colors.black,
                 )),
             BottomNavigationBarItem(
+              
                 label: "WEB",
                 icon: Icon(
                   FontAwesomeIcons.globe,

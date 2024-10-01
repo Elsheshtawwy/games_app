@@ -44,6 +44,8 @@ dependencies:
   auto_size_text:
   url_launcher:
   full_screen_image:
+  firebase_core: 
+  firebase_auth:
 
 
 dev_dependencies:

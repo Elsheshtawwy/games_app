@@ -1,10 +1,20 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:games_app/providers/dark_mode_provider.dart';
 import 'package:games_app/providers/games_provider.dart';
+import 'package:games_app/screens/home_screen.dart';
+import 'package:games_app/screens/loginscreen.dart';
 import 'package:games_app/screens/splash_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -37,5 +47,23 @@ class MyApp extends StatelessWidget {
         );
       }),
     );
+  }
+}
+
+class ScreenRouter extends StatefulWidget {
+  const ScreenRouter({super.key});
+
+  @override
+  State<ScreenRouter> createState() => _ScreenRouterState();
+}
+
+class _ScreenRouterState extends State<ScreenRouter> {
+  FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+
+  @override
+  Widget build(BuildContext context) {
+    return firebaseAuth.currentUser != null
+        ? const HomeScreen()
+        : const Loginscreen();
   }
 }

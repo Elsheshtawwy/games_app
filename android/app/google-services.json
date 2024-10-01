@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "37217885985",
+    "project_id": "gamesway-2ca32",
+    "storage_bucket": "gamesway-2ca32.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:37217885985:android:b927538e182e1a49be6860",
+        "android_client_info": {
+          "package_name": "com.example.games_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDDBp6S37TtxLvK7iC06QrH-8Q78aqs7Ew"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

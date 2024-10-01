@@ -1,6 +1,6 @@
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:full_screen_image/full_screen_image.dart';
-import 'package:games_app/helpers/clicables/drawer_tile.dart';
+import 'package:games_app/helpers/clickable/drawer_tile.dart';
 import 'package:games_app/providers/dark_mode_provider.dart';
 import 'package:games_app/providers/games_provider.dart';
 import 'package:games_app/widgets/cards/game_card.dart';
@@ -122,7 +122,7 @@ class _GameDetailsScreenState extends State<GameDetailsScreen> {
                                 gameDetailsConsumer.detailedGameModel!.gameUrl,
                               );
                             },
-                            child: Text("data")),
+                            child: const Text("data")),
                         const SizedBox(height: 8),
                         Text(
                           gameDetailsConsumer.detailedGameModel!.title,
@@ -254,7 +254,7 @@ class _GameDetailsScreenState extends State<GameDetailsScreen> {
                                     child: Padding(
                                         padding: const EdgeInsets.all(8),
                                         child: gameDetailsConsumer.isLoading
-                                            ? CircularProgressIndicator()
+                                            ? const CircularProgressIndicator()
                                             : GestureDetector(
                                                 onTap: () {
                                                   Navigator.push(

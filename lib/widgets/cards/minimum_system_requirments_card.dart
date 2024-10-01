@@ -4,7 +4,7 @@ import 'package:games_app/providers/dark_mode_provider.dart';
 import 'package:provider/provider.dart';
 
 class MinimumSystemRequirmentsCard extends StatelessWidget {
-  MinimumSystemRequirmentsCard(
+  const MinimumSystemRequirmentsCard(
       {super.key, required this.minimumSystemRequirments});
   final MinimumSystemRequirements? minimumSystemRequirments;
 

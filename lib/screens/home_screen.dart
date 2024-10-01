@@ -1,6 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:games_app/helpers/clickable/drawer_tile.dart';
+import 'package:games_app/helpers/clickable/mainButton.dart';
+import 'package:games_app/main.dart';
+import 'package:games_app/providers/auth_provider.dart';
 import 'package:games_app/providers/dark_mode_provider.dart';
 import 'package:games_app/providers/games_provider.dart';
 import 'package:games_app/screens/game_details.dart';
@@ -45,6 +49,29 @@ class _HomeScreenState extends State<HomeScreen> {
                       : Icons.light_mode,
                   text: darkModeConsumer.isDark ? "Dark Mode" : "Light Mode",
                 ),
+                Mainbutton(
+                  onPressed: () {
+                    Provider.of<Auth_Provider>(context, listen: false)
+                        .logout()
+                        .then((loggedOut) {
+                      if (loggedOut) {
+                        Navigator.pushReplacement(
+                          context,
+                          CupertinoPageRoute(
+                            builder: (context) => ScreenRouter(),
+                          ),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Logout failed'),
+                          ),
+                        );
+                      }
+                    });
+                  },
+                  label: "Log Out",
+                ),
               ],
             ),
           ),
@@ -52,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
         appBar: AppBar(),
         body: Center(
           child: GridView.builder(
-            itemCount: gamesProvider.isLoading ? 6 : gamesProvider.games.length,
+            itemCount: gamesProvider.busy ? 6 : gamesProvider.games.length,
             padding: const EdgeInsets.all(16),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               mainAxisSpacing: 16,
@@ -63,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
             itemBuilder: (context, index) {
               return AnimatedSwitcher(
                 duration: const Duration(milliseconds: 300),
-                child: gamesProvider.isLoading
+                child: gamesProvider.busy
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(16),
                         child: Shimmer.fromColors(
@@ -81,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (contex) => GameDetailsScreen(
+                                  builder: (context) => GameDetailsScreen(
                                       gameId: gamesProvider.games[index].id
                                           .toString())));
                         },
@@ -131,7 +158,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: darkModeConsumer.isDark ? Colors.white : Colors.black,
                 )),
             BottomNavigationBarItem(
-              
                 label: "WEB",
                 icon: Icon(
                   FontAwesomeIcons.globe,

@@ -55,7 +55,7 @@ class _GameDetailsScreenState extends State<GameDetailsScreen> {
         appBar: AppBar(
           centerTitle: true,
           title: Text(
-            gameDetailsConsumer.isLoading ||
+            gameDetailsConsumer.busy ||
                     gameDetailsConsumer.detailedGameModel == null
                 ? "Loading..."
                 : gameDetailsConsumer.detailedGameModel!.title,
@@ -63,7 +63,7 @@ class _GameDetailsScreenState extends State<GameDetailsScreen> {
           ),
         ),
         body: Center(
-          child: gameDetailsConsumer.isLoading &&
+          child: gameDetailsConsumer.busy &&
                   gameDetailsConsumer.detailedGameModel == null
               ? const CircularProgressIndicator()
               : SingleChildScrollView(
@@ -253,7 +253,7 @@ class _GameDetailsScreenState extends State<GameDetailsScreen> {
                                     duration: const Duration(milliseconds: 300),
                                     child: Padding(
                                         padding: const EdgeInsets.all(8),
-                                        child: gameDetailsConsumer.isLoading
+                                        child: gameDetailsConsumer.busy
                                             ? const CircularProgressIndicator()
                                             : GestureDetector(
                                                 onTap: () {

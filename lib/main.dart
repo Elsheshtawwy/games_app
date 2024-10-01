@@ -1,9 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:games_app/providers/auth_provider.dart';
+import 'package:games_app/providers/base_provider.dart';
 import 'package:games_app/providers/dark_mode_provider.dart';
 import 'package:games_app/providers/games_provider.dart';
 import 'package:games_app/screens/home_screen.dart';
 import 'package:games_app/screens/loginscreen.dart';
+import 'package:games_app/screens/register.dart';
 import 'package:games_app/screens/splash_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -25,9 +28,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+         ChangeNotifierProvider<BaseProvider>(
+            create: (_) => BaseProvider()),
         ChangeNotifierProvider<DarkModeProvider>(
             create: (_) => DarkModeProvider()),
         ChangeNotifierProvider<GamesProvider>(create: (_) => GamesProvider()),
+        ChangeNotifierProvider<Auth_Provider>(create: (_)=> Auth_Provider())
       ],
       child:
           Consumer<DarkModeProvider>(builder: (context, darkModeConsumer, _) {
@@ -64,6 +70,6 @@ class _ScreenRouterState extends State<ScreenRouter> {
   Widget build(BuildContext context) {
     return firebaseAuth.currentUser != null
         ? const HomeScreen()
-        : const Loginscreen();
+        : const RegisterScreen();
   }
 }

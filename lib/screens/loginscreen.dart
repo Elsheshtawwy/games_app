@@ -88,7 +88,7 @@ class _LoginscreenState extends State<Loginscreen> {
                           Navigator.pushReplacement(
                             context,
                             CupertinoPageRoute(
-                              builder: (context) => ScreenRouter(),
+                              builder: (context) => const ScreenRouter(),
                             ),
                           );
                         } else {
@@ -102,25 +102,26 @@ class _LoginscreenState extends State<Loginscreen> {
                     }
                   },
                   child: const Text(
-                    "Login",
+                    "Log in",
                     style: TextStyle(fontSize: 20),
                   ),
                 ),
-                  Row(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
+                    const Text(
                       "Don't have an account? ",
                     ),
                     TextButton(
-                        child: Text(
+                        child: const Text(
                           "Sign Up",
                         ),
                         onPressed: () {
                           Navigator.pushReplacement(
                               context,
                               CupertinoPageRoute(
-                                  builder: (context) => RegisterScreen()));
+                                  builder: (context) =>
+                                      const RegisterScreen()));
                         })
                   ],
                 )

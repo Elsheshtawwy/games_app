@@ -15,7 +15,7 @@ class Mainbutton extends StatelessWidget {
           onPressed();
         },
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
           child: Text(label),
         ));
   }

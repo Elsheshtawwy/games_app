@@ -58,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         Navigator.pushReplacement(
                           context,
                           CupertinoPageRoute(
-                            builder: (context) => ScreenRouter(),
+                            builder: (context) => const ScreenRouter(),
                           ),
                         );
                       } else {

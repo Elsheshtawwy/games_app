@@ -82,13 +82,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   onPressed: () {
                     if (formKey.currentState!.validate()) {
                       Provider.of<Auth_Provider>(context, listen: false)
-                          .login(emailController.text, passwordController.text)
+                          .createAccount(emailController.text, passwordController.text)
                           .then((loggedIn) {
                         if (loggedIn) {
                           Navigator.pushReplacement(
                             context,
                             CupertinoPageRoute(
-                              builder: (context) => ScreenRouter(),
+                              builder: (context) => const ScreenRouter(),
                             ),
                           );
                         } else {
@@ -109,18 +109,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
+                    const Text(
                       "Already Have an account? ",
                     ),
                     TextButton(
-                        child: Text(
+                        child: const Text(
                           "Log in",
                         ),
                         onPressed: () {
                           Navigator.pushReplacement(
                               context,
                               CupertinoPageRoute(
-                                  builder: (context) => Loginscreen()));
+                                  builder: (context) => const Loginscreen()));
                         })
                   ],
                 )

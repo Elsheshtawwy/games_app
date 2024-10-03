@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:games_app/helpers/clickable/drawer_tile.dart';
 import 'package:games_app/helpers/clickable/mainButton.dart';
+import 'package:games_app/helpers/notifiction__helper.dart';
 import 'package:games_app/main.dart';
 import 'package:games_app/providers/auth_provider.dart';
 import 'package:games_app/providers/dark_mode_provider.dart';
@@ -22,11 +23,15 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int nowIndex = 0;
+  
+  final NotificationManager notificationManager = NotificationManager();
 
   @override
   void initState() {
     Provider.of<GamesProvider>(context, listen: false).fetchGames("all");
     Provider.of<DarkModeProvider>(context, listen: false).getMode();
+    
+    notificationManager.setupFlutterNotifications();
 
     super.initState();
   }
@@ -76,7 +81,18 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ),
-        appBar: AppBar(),
+        appBar: AppBar(
+          title: Text('Home Screen'),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.notification_add),
+              onPressed: () {
+                // إظهار الإشعار عند الضغط على الزر
+                notificationManager.showTestNotification();
+              },
+            ),
+          ],
+        ),
         body: Center(
           child: GridView.builder(
             itemCount: gamesProvider.busy ? 6 : gamesProvider.games.length,

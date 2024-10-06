@@ -1,0 +1,69 @@
+import 'dart:async';
+
+import 'package:games_app/helpers/clickable/main_button.dart';
+import 'package:games_app/helpers/consts.dart';
+import 'package:games_app/helpers/functions_helper.dart';
+import 'package:games_app/models/GameCardModel.dart';
+import 'package:games_app/providers/games_provider.dart';
+import 'package:provider/provider.dart';
+
+import 'package:flutter/material.dart';
+
+class DeleteFavoriteDialog extends StatefulWidget {
+  const DeleteFavoriteDialog({super.key, required this.gameModel});
+  final GameModel gameModel;
+  @override
+  State<DeleteFavoriteDialog> createState() => _DeleteFavoriteDialogState();
+}
+
+class _DeleteFavoriteDialogState extends State<DeleteFavoriteDialog> {
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<GamesProvider>(builder: (context, gamesConsumer, child) {
+      return AlertDialog(
+        title: const Text("Delete From Favorites"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+                "Are you sure you want to Delete this game from favorite?"),
+            const SizedBox(
+              height: 16,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                MainButton(
+                    inProgress: gamesConsumer.busy,
+                    horizontalPadding: 16,
+                    label: "Delete",
+                    onPressed: () async {
+                      await Provider.of<GamesProvider>(context, listen: false)
+                          .deleteFromFavorite(widget.gameModel)
+                          .then((deleted) {
+                        if (deleted) {
+                          showFlush("Deleted", "Deleted Successfully", context);
+
+                          Timer(const Duration(seconds: 3), () {
+                            Navigator.pop(context);
+                          });
+                        } else {
+                          showFlush("Failed", " Failed Delete", context);
+                        }
+                      });
+                    }),
+                MainButton(
+                    horizontalPadding: 16,
+                    btnColor: redColor,
+                    label: "Cancel",
+                    onPressed: () {
+                      Navigator.pop(context);
+                    })
+              ],
+            )
+          ],
+        ),
+      );
+    });
+  }
+}

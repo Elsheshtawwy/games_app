@@ -15,6 +15,7 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
@@ -37,6 +38,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     fontSize: 30,
                     color: Colors.blue,
                   ),
+                ),
+                const SizedBox(height: 20),
+                TextFormField(
+                  controller: nameController,
+                  decoration: InputDecoration(
+                    labelText: "Name",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return "Please enter your name";
+                    } else {
+                      return null;
+                    }
+                  },
                 ),
                 const SizedBox(height: 20),
                 TextFormField(
@@ -82,7 +100,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   onPressed: () {
                     if (formKey.currentState!.validate()) {
                       Provider.of<Auth_Provider>(context, listen: false)
-                          .createAccount(emailController.text, passwordController.text)
+                          .createAccount(
+                              nameController.text
+                              ,emailController.text, passwordController.text)
                           .then((loggedIn) {
                         if (loggedIn) {
                           Navigator.pushReplacement(

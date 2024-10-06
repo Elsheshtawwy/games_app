@@ -278,7 +278,12 @@ class _GameDetailsScreenState extends State<GameDetailsScreen> {
                                                         gameModel:
                                                             gameDetailsConsumer
                                                                     .similarGames[
-                                                                index]),
+                                                                index],
+                                                                onLongPress: (){
+                                                                  print(gameDetailsConsumer.similarGames[index].id);
+                                                                },
+                                                                
+                                                                ),
                                                   ),
                                                 ),
                                               )));

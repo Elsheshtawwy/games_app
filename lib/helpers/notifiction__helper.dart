@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -44,17 +43,18 @@ class NotificationManager {
 
     await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
-      onDidReceiveNotificationResponse: (details) {
-      },
+      onDidReceiveNotificationResponse: (details) {},
     );
 
     await flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
 
     await Permission.notification.request();
 
-    await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    await FirebaseMessaging.instance
+        .setForegroundNotificationPresentationOptions(
       alert: true,
       badge: true,
       sound: true,
@@ -134,8 +134,8 @@ class NotificationManager {
 
     flutterLocalNotificationsPlugin.show(
       157,
-      "Test",
-      "Body Test",
+      "Bruhhhh",
+      "Kill those idiots",
       notificationDetails,
       payload: jsonEncode({"test": "data"}),
     );

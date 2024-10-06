@@ -5,7 +5,6 @@ import 'package:games_app/providers/base_provider.dart';
 import 'package:games_app/providers/dark_mode_provider.dart';
 import 'package:games_app/providers/games_provider.dart';
 import 'package:games_app/screens/home_screen.dart';
-import 'package:games_app/screens/loginscreen.dart';
 import 'package:games_app/screens/register.dart';
 import 'package:games_app/screens/splash_screen.dart';
 import 'package:provider/provider.dart';

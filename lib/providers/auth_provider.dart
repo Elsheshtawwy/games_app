@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:games_app/providers/base_provider.dart';
 
@@ -7,34 +8,46 @@ class Auth_Provider extends BaseProvider {
   bool loading = false;
   Future<bool> login(String email, String password) async {
     setBusy(true);
-    UserCredential userCredential = await firebaseAuth
-        .signInWithEmailAndPassword(email: email, password: password);
-    if (userCredential.user != null) {
+    UserCredential userCred = await firebaseAuth.signInWithEmailAndPassword(
+        email: email, password: password);
+    if (userCred.user != null) {
       setBusy(false);
+
       return true;
     } else {
       setBusy(false);
+
       return false;
     }
   }
 
-  Future<bool> createAccount(String email, String password) async {
-    UserCredential userCredential = await firebaseAuth
-        .createUserWithEmailAndPassword(email: email, password: password);
-    if (userCredential.user != null) {
-      {
-        setBusy(false);
-        return true;
-      }
-    } else {
-      setBusy(false);
+  Future<bool> resetPassword(String email) async {
+    setBusy(true);
+    firebaseAuth.sendPasswordResetEmail(email: email);
+
+    setBusy(false);
+
+    return true;
+  }
+
+  Future<bool> createAccount(String name, String email, String password) async {
+    UserCredential userCred = await firebaseAuth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    if (userCred.user != null) {
+      FirebaseFirestore.instance
+          .collection("users")
+          .add({"name": name, "email": email, "user_uid": userCred.user!.uid});
+
       return true;
+    } else {
+      return false;
     }
   }
 
   Future<bool> logout() async {
-    setBusy(true);
-    await firebaseAuth.signOut();
+    firebaseAuth.signOut();
     return true;
   }
 }
